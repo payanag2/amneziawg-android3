@@ -34,6 +34,17 @@ jobs:
         submodules: recursive
         fetch-depth: 0
 
+    # The source import copied .gitmodules but did not preserve the gitlink entries.
+    # Clone the two native build dependencies explicitly so CMake can find their sources.
+    - name: Fetch native submodule sources
+      shell: bash
+      run: |
+        set -euo pipefail
+        git clone --depth 1 https://github.com/amnezia-vpn/amneziawg-tools.git tunnel/tools/amneziawg-tools
+        git clone --depth 1 https://github.com/termux/termux-elf-cleaner.git tunnel/tools/elf-cleaner
+        test -f tunnel/tools/amneziawg-tools/src/wg-quick/android.c
+        test -n "$(find tunnel/tools/elf-cleaner -maxdepth 1 -type f \\( -name '*.c' -o -name '*.cpp' \\) -print -quit)"
+
     - name: Set up JDK
       uses: actions/setup-java@v4
       with:
