@@ -180,11 +180,22 @@ jobs:
 
         echo "final_file=${FINAL}" >> "$GITHUB_OUTPUT"
 
+    - name: Rename APK
+      if: ${{ steps.cfg.outputs.kind == 'apk' }}
+      id: named
+      shell: bash
+      run: |
+        set -euo pipefail
+        FILE="${{ steps.named.outputs.final_file || steps.sign.outputs.final_file || steps.locate.outputs.built_file }}"
+        FINAL="AmneziaWG Payanag3.apk"
+        mv "$FILE" "$FINAL"
+        echo "final_file=$FINAL" >> "$GITHUB_OUTPUT"
+
     - name: Upload artifact
       uses: actions/upload-artifact@v4
       with:
         name: ${{ steps.cfg.outputs.artifact_name }}
-        path: ${{ steps.sign.outputs.final_file || steps.locate.outputs.built_file }}
+        path: ${{ steps.named.outputs.final_file || steps.sign.outputs.final_file || steps.locate.outputs.built_file }}
         if-no-files-found: error
 
     - name: Publish build to GitHub Release
