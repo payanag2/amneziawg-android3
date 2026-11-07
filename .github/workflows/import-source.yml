@@ -1,0 +1,67 @@
+name: Import and customize AmneziaWG Android 3
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/import-source.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  import:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout destination repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Import source and create independent app identity
+        shell: bash
+        run: |
+          set -euo pipefail
+          cp .github/workflows/import-source.yml /tmp/import-source.yml
+          git clone --depth 1 https://github.com/payanag2/amneziawg-android.git /tmp/source
+          rsync -a --delete --exclude='.git' /tmp/source/ ./
+          mkdir -p .github/workflows
+          cp /tmp/import-source.yml .github/workflows/import-source.yml
+
+          python3 - <<'PY'
+          from pathlib import Path
+
+          p = Path("gradle.properties")
+          s = p.read_text()
+          import re
+          s, n = re.subn(r"(?m)^amneziawgPackageName=.*$", "amneziawgPackageName=com.payanag2.amneziawg3", s)
+          if n == 0:
+              s += "\namneziawgPackageName=com.payanag2.amneziawg3\n"
+          p.write_text(s)
+
+          for name in ["ui/src/main/java/org/amnezia/awg/model/TunnelManager.kt",
+                       "ui/src/main/AndroidManifest.xml"]:
+              p = Path(name)
+              if p.exists():
+                  s = p.read_text()
+                  s = s.replace("com.payanag2.amneziawg.action.", "com.payanag2.amneziawg3.action.")
+                  p.write_text(s)
+
+          p = Path("ui/src/main/res/values/strings.xml")
+          if p.exists():
+              s = p.read_text()
+              s = re.sub(r'(<string\s+name="app_name"[^>]*>).*?(</string>)',
+                         r'\1AmneziaWG Payanag2 3\2', s, count=1, flags=re.S)
+              p.write_text(s)
+          PY
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          if git diff --cached --quiet; then
+            echo "No source changes to commit."
+          else
+            git commit -m "Import AmneziaWG Android and create independent third client"
+            git push origin HEAD:main
+          fi
