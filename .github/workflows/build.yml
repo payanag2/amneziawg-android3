@@ -202,12 +202,12 @@ jobs:
         elif [[ "${{ inputs.target }}" == "debug_apk" ]]; then
           gh release create "${TAG}" "${FILE}" \
             --repo "${{ github.repository }}" \
-            --title "AmneziaWG Payanag2 3 — Debug build #${{ github.run_number }}" \
+            --title "AmneziaWG Payanag3 — Debug build #${{ github.run_number }}" \
             --notes "Automated debug APK build from ${{ inputs.ref || github.ref_name }}." \
             --prerelease
         else
           gh release create "${TAG}" "${FILE}" \
             --repo "${{ github.repository }}" \
-            --title "AmneziaWG Payanag2 3 — ${{ inputs.target }} #${{ github.run_number }}" \
+            --title "AmneziaWG Payanag3 — ${{ inputs.target }} #${{ github.run_number }}" \
             --notes "Automated ${{ inputs.target }} build from ${{ inputs.ref || github.ref_name }}."
         fi
