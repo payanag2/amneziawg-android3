@@ -205,7 +205,7 @@ jobs:
       run: |
         set -euo pipefail
 
-        FILE="${{ steps.sign.outputs.final_file || steps.locate.outputs.built_file }}"
+        FILE="${{ steps.named.outputs.final_file || steps.sign.outputs.final_file || steps.locate.outputs.built_file }}"
         TAG="build-${{ github.run_number }}"
 
         if gh release view "${TAG}" --repo "${{ github.repository }}" >/dev/null 2>&1; then
