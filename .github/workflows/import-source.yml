@@ -25,7 +25,7 @@ jobs:
           set -euo pipefail
           cp .github/workflows/import-source.yml /tmp/import-source.yml
           git clone --depth 1 https://github.com/payanag2/amneziawg-android.git /tmp/source
-          rsync -a --delete --exclude='.git' /tmp/source/ ./
+          rsync -a --delete --exclude='.git' --exclude='.github/workflows/build.yml' /tmp/source/ ./
           mkdir -p .github/workflows
           cp /tmp/import-source.yml .github/workflows/import-source.yml
 
