@@ -43,7 +43,7 @@ jobs:
         git clone --depth 1 https://github.com/amnezia-vpn/amneziawg-tools.git tunnel/tools/amneziawg-tools
         git clone --depth 1 https://github.com/termux/termux-elf-cleaner.git tunnel/tools/elf-cleaner
         test -f tunnel/tools/amneziawg-tools/src/wg-quick/android.c
-        find tunnel/tools/elf-cleaner -maxdepth 1 -type f | grep -Eq '\.(c|cpp)
+        find tunnel/tools/elf-cleaner -maxdepth 1 -type f | grep -Eq '\.(c|cpp)$'
 
     - name: Set up JDK
       uses: actions/setup-java@v4
